@@ -5,6 +5,7 @@
         string(name: 'INSTANCE_TYPE', description: 'Terraform instance_type variable')
         string(name: 'TAG_NAME', description: 'Terraform tag_name variable')
         string(name: 'AMI_ID', description: 'Terraform ami_id variable')
+        booleanParam(name: "ACTION", defaultValue: false)
     }
     stages {
         stage('init') {

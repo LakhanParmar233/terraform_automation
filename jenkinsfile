@@ -1,18 +1,40 @@
- pipeline {
+pipeline {
     agent any
+
     parameters {
         string(name: 'REGION', description: 'Terraform region variable')
         string(name: 'INSTANCE_TYPE', description: 'Terraform instance_type variable')
         string(name: 'TAG_NAME', description: 'Terraform tag_name variable')
         string(name: 'AMI_ID', description: 'Terraform ami_id variable')
+        string(name: 'ACTION', description: 'Enter "plan" or "apply"', defaultValue: 'plan')
     }
+
     stages {
-        stage('init') {
+        stage('User Input') {
             steps {
-                sh ('terraform init') 
+                script {
+                    def userInput = input(
+                        message: 'Choose Terraform action:',
+                        parameters: [
+                            choice(choices: ['plan', 'apply'], description: 'Select "plan" or "apply"', name: 'ACTION')
+                        ]
+                    )
+                }
             }
         }
+
+        stage('Checkout') {
+            steps {
+                // Checkout your Terraform project from version control.
+                // Replace the repository URL with your Terraform project's URL.
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: 'https://github.com/yourusername/your-terraform-project.git']]])
+            }
+        }
+
         stage('Modify terraform.tfvars') {
+            when {
+                expression { params.ACTION == 'plan' }
+            }
             steps {
                 script {
                     def terraformVarsFile = "${WORKSPACE}/terraform.tfvars"
@@ -31,11 +53,49 @@
                 }
             }
         }
-        stage('terraform  action') {
+
+        stage('Terraform Init') {
+            when {
+                expression { params.ACTION == 'plan' }
+            }
             steps {
-                echo "Terraform action is --> ${action}"
-                sh ('terraform ${action} --auto-approve')
+                // Execute 'terraform init'
+                sh 'terraform init'
             }
         }
-}
+
+        stage('Terraform Apply or Plan') {
+            when {
+                expression { params.ACTION == 'apply' }
+            }
+            steps {
+                // Execute 'terraform apply' when ACTION is 'apply'
+                sh 'terraform apply -auto-approve'
+            }
+            post {
+                failure {
+                    script {
+                        // Handle failure when ACTION is 'apply'
+                        currentBuild.result = 'FAILURE'
+                    }
+                }
+            }
+        }
+
+        stage('Terraform Plan') {
+            when {
+                expression { params.ACTION == 'plan' }
+            }
+            steps {
+                // Execute 'terraform plan' when ACTION is 'plan'
+                sh 'terraform plan'
+            }
+        }
+    }
+
+    post {
+        always {
+            // Clean up or perform any necessary post-build tasks.
+        }
+    }
 }

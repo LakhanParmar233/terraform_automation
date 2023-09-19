@@ -92,10 +92,4 @@ pipeline {
             }
         }
     }
-
-    post {
-        always {
-            // Clean up or perform any necessary post-build tasks.
-        }
-    }
 }

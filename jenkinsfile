@@ -58,8 +58,8 @@ pipeline {
                 expression { params.ACTION == 'plan' }
             }
             steps {
-                // Execute 'terraform plan'
-                sh 'terraform plan'
+                echo "Terraform action is --> ${action}"
+                sh ('terraform ${action}')
             }
         }
         stage('Verify Plan and Proceed') {
@@ -83,8 +83,8 @@ pipeline {
         }
         stage('Terraform Apply') {
             steps {
-                // Execute 'terraform apply'
-                sh 'terraform ${params.ACTION} -auto-approve'
+                echo "Terraform action is --> ${action}"
+                sh ('terraform ${ACTION} --auto-approve')
             }
         }
     }

@@ -23,14 +23,6 @@ pipeline {
             }
         }
 
-        stage('Checkout') {
-            steps {
-                // Checkout your Terraform project from version control.
-                // Replace the repository URL with your Terraform project's URL.
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: 'https://github.com/yourusername/your-terraform-project.git']]])
-            }
-        }
-
         stage('Modify terraform.tfvars') {
             when {
                 expression { params.ACTION == 'plan' }

@@ -9,17 +9,10 @@ pipeline {
         string(name: 'ACTION', description: 'Enter "plan" or "apply" or "destroy"', defaultValue: 'plan')
     }
 
-    stages {
-        stage('User Input') {
+        stage('Terraform Init') {
             steps {
-                script {
-                    def userInput = input(
-                        message: 'Choose Terraform action:',
-                        parameters: [
-                            choice(choices: ['plan', 'apply', 'destroy'], description: 'Select "plan" or "apply"', name: 'ACTION')
-                        ]
-                    )
-                }
+                // Execute 'terraform init'
+                sh 'terraform init'
             }
         }
 
@@ -42,36 +35,22 @@ pipeline {
                 }
             }
         }
-
-        stage('Terraform Init') {
-            steps {
-                // Execute 'terraform init'
-                sh 'terraform init'
-            }
-        }
-
         stage('Terraform Plan') {
             steps {
                 echo "Terraform action is --> plan"
                 sh ('terraform plan')
             }
         }
-        stage('Verify Plan and Proceed') {
-            when {
-                expression { params.ACTION == 'plan' }
-            }
+    stages {
+        stage('User Input') {
             steps {
                 script {
                     def userInput = input(
-                        message: 'Verify the Terraform plan. If everything looks good, enter "proceed" to apply the changes:',
+                        message: 'Choose Terraform action:',
                         parameters: [
-                            string(description: 'Enter "proceed" to apply the changes', name: 'VERIFY_ACTION')
+                            choice(choices: ['apply', 'destroy'], description: 'Select "plan" or "apply"', name: 'ACTION')
                         ]
                     )
-                    if (userInput != 'proceed') {
-                        currentBuild.result = 'ABORTED'
-                        error("Verification failed. Aborting the build.")
-                    }
                 }
             }
         }

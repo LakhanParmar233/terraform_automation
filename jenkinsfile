@@ -85,7 +85,18 @@ pipeline {
                 }
             }
         }
-
+        stage('User Input') {
+            steps {
+                script {
+                    def userInput = input(
+                        message: 'Choose Terraform action:',
+                        parameters: [
+                            choice(choices: ['plan', 'apply'], description: 'Select "plan" or "apply"', name: 'ACTION')
+                        ]
+                    )
+                }
+            }
+        }
         stage('Terraform Apply') {
             when {
                 expression { params.ACTION == 'apply' }

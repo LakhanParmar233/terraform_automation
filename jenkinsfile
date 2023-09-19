@@ -8,7 +8,7 @@ pipeline {
         string(name: 'AMI_ID', description: 'Terraform ami_id variable')
         string(name: 'ACTION', description: 'Enter "plan" or "apply" or "destroy"', defaultValue: 'plan')
     }
-
+    stages {
         stage('Terraform Init') {
             steps {
                 // Execute 'terraform init'
@@ -41,7 +41,6 @@ pipeline {
                 sh ('terraform plan')
             }
         }
-    stages {
         stage('User Input') {
             steps {
                 script {
@@ -51,6 +50,25 @@ pipeline {
                             choice(choices: ['apply', 'destroy'], description: 'Select "plan" or "apply"', name: 'ACTION')
                         ]
                     )
+                }
+            }
+        }
+        stage('Verify Plan and Proceed') {
+            when {
+                expression { params.ACTION == 'plan' }
+            }
+            steps {
+                script {
+                    def userInput = input(
+                        message: 'Verify the Terraform plan. If everything looks good, enter "proceed" to apply the changes:',
+                        parameters: [
+                            string(description: 'Enter "proceed" to apply the changes', name: 'VERIFY_ACTION')
+                        ]
+                    )
+                    if (userInput != 'proceed') {
+                        currentBuild.result = 'ABORTED'
+                        error("Verification failed. Aborting the build.")
+                    }
                 }
             }
         }

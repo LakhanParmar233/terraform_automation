@@ -1,10 +1,32 @@
  pipeline {
     agent any
- 
+    parameters {
+        string(name: 'REGION', description: 'Terraform region variable')
+        string(name: 'INSTANCE_TYPE', description: 'Terraform instance_type variable')
+        string(name: 'ENVIRONMENT', description: 'Terraform environment variable')
+    }
     stages {
         stage('init') {
             steps {
                 sh ('terraform init') 
+            }
+        }
+        stage('Modify terraform.tfvars') {
+            steps {
+                script {
+                    def terraformVarsFile = "${WORKSPACE}/terraform.tfvars"
+
+                    // Read the content of terraform.tfvars
+                    def terraformVarsContent = readFile(terraformVarsFile)
+
+                    // Replace variables with Jenkins parameters
+                    terraformVarsContent = terraformVarsContent.replaceAll(/region = ".+"/, "region = \"${params.REGION}\"")
+                    terraformVarsContent = terraformVarsContent.replaceAll(/instance_type = ".+"/, "instance_type = \"${params.INSTANCE_TYPE}\"")
+                    terraformVarsContent = terraformVarsContent.replaceAll(/environment = ".+"/, "environment = \"${params.ENVIRONMENT}\"")
+
+                    // Write the modified content back to terraform.tfvars
+                    writeFile(file: terraformVarsFile, text: terraformVarsContent)
+                }
             }
         }
         stage('terraform  action') {

@@ -44,9 +44,6 @@ pipeline {
         }
 
         stage('Terraform Init') {
-            when {
-                expression { params.ACTION == 'plan' }
-            }
             steps {
                 // Execute 'terraform init'
                 sh 'terraform init'
@@ -54,12 +51,9 @@ pipeline {
         }
 
         stage('Terraform Plan') {
-            when {
-                expression { params.ACTION == 'plan' }
-            }
             steps {
-                echo "Terraform action is --> ${ACTION}"
-                sh ('terraform ${ACTION}')
+                echo "Terraform action is --> plan"
+                sh ('terraform plan')
             }
         }
         stage('Verify Plan and Proceed') {

@@ -85,7 +85,7 @@ pipeline {
                 }
             }
         }
-        stage('User Input') {
+        stage('User Input Test') {
             steps {
                 script {
                     def userInput = input(

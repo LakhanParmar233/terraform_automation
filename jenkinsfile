@@ -65,6 +65,25 @@ pipeline {
                 sh 'terraform plan'
             }
         }
+        stage('Verify Plan and Proceed') {
+            when {
+                expression { params.ACTION == 'plan' }
+            }
+            steps {
+                script {
+                    def userInput = input(
+                        message: 'Verify the Terraform plan. If everything looks good, enter "proceed" to apply the changes:',
+                        parameters: [
+                            string(description: 'Enter "proceed" to apply the changes', name: 'VERIFY_ACTION')
+                        ]
+                    )
+                    if (userInput != 'proceed') {
+                        currentBuild.result = 'ABORTED'
+                        error("Verification failed. Aborting the build.")
+                    }
+                }
+            }
+        }
         stage('Terraform Apply') {
             steps {
                 // Execute 'terraform apply'

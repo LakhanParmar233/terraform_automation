@@ -3,7 +3,8 @@
     parameters {
         string(name: 'REGION', description: 'Terraform region variable')
         string(name: 'INSTANCE_TYPE', description: 'Terraform instance_type variable')
-        string(name: 'ENVIRONMENT', description: 'Terraform environment variable')
+        string(name: 'TAG_NAME', description: 'Terraform tag_name variable')
+        string(name: 'AMI_ID', description: 'Terraform ami_id variable')
     }
     stages {
         stage('init') {
@@ -22,7 +23,8 @@
                     // Replace variables with Jenkins parameters
                     terraformVarsContent = terraformVarsContent.replaceAll(/region = ".+"/, "region = \"${params.REGION}\"")
                     terraformVarsContent = terraformVarsContent.replaceAll(/instance_type = ".+"/, "instance_type = \"${params.INSTANCE_TYPE}\"")
-                    terraformVarsContent = terraformVarsContent.replaceAll(/environment = ".+"/, "environment = \"${params.ENVIRONMENT}\"")
+                    terraformVarsContent = terraformVarsContent.replaceAll(/tag_name = ".+"/, "tag_name = \"${params.TAG_NAME}\"")
+                    terraformVarsContent = terraformVarsContent.replaceAll(/ami_id = ".+"/, "ami_id = \"${params.AMI_ID}\"")
 
                     // Write the modified content back to terraform.tfvars
                     writeFile(file: terraformVarsFile, text: terraformVarsContent)

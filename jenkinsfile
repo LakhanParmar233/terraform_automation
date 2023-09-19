@@ -24,9 +24,6 @@ pipeline {
         }
 
         stage('Modify terraform.tfvars') {
-            when {
-                expression { params.ACTION == 'plan' }
-            }
             steps {
                 script {
                     def terraformVarsFile = "${WORKSPACE}/terraform.tfvars"

@@ -16,7 +16,7 @@ pipeline {
                     def userInput = input(
                         message: 'Choose Terraform action:',
                         parameters: [
-                            choice(choices: ['plan', 'apply'], description: 'Select "plan" or "apply"', name: 'ACTION')
+                            choice(choices: ['plan', 'apply', 'destroy'], description: 'Select "plan" or "apply"', name: 'ACTION')
                         ]
                     )
                 }

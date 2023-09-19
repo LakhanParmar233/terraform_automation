@@ -34,16 +34,8 @@
         }
         stage('terraform  action') {
             steps {
-              script{
-               if(params.ACTION){
                   echo "Terraform action is --> ${action}"
                   sh ('terraform ${action} --auto-approve')
-               }else{
-                  echo "Terraform action is --> ${action}"
-                  sh ('terraform ${action}')}
-              }
-
-            }
         }
     }
     

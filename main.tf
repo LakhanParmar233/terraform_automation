@@ -29,3 +29,12 @@ resource "aws_instance" "myFirstInstance2" {
     Name = var.tag_name
   }
 }
+
+resource "aws_instance" "myFirstInstance4" {
+  ami           = var.ami_id
+  instance_type = var.instance_type
+  tags= {
+    Name = var.tag_name
+  }
+}
+
